@@ -19,8 +19,11 @@ namespace MoviesProcessing.Services
       private const string _genresResource = "/genre/movie/list";
       private const string _creditsResource = "/movie/movie_id/credits";
       private const string _apiKey = "MovieDbKey";
+
       private const string _apiKeyParameter = "api_key";
       private const string _movieIdParameter = "movie_id";
+      private const string _withCastParameter = "with_cast";
+      private const string _withCrewParameter = "with_crew";
 
       public MovieApiService(IConfiguration config)
       {
@@ -57,6 +60,42 @@ namespace MoviesProcessing.Services
          var credits = JsonConvert.DeserializeObject<CreditsResponse>(response.Content);
 
          return credits;
+      }
+
+      public async Task<IEnumerable<Movie>> GetActorMovies(string actorId)
+      {
+         var request = GetRequest(_discoverResource);
+
+         request.AddParameter(_withCastParameter, actorId);
+         var movies = await GetAllMoviePages(request);
+
+         return movies;
+      }
+
+      public async Task<IEnumerable<Movie>> GetCrewMovies(string crewId)
+      {
+         var request = GetRequest(_discoverResource);
+
+         request.AddParameter(_withCrewParameter, crewId);
+         var movies = await GetAllMoviePages(request);
+
+         return movies;
+      }
+
+      private async Task<IEnumerable<Movie>> GetAllMoviePages(IRestRequest request)
+      {
+         var items = new List<Movie>();
+         MoviesResponseModel responseModel = null;
+
+         do
+         {
+            var response = await _restClient.ExecuteGetAsync(request);
+            responseModel = JsonConvert.DeserializeObject<MoviesResponseModel>(response.Content);
+            items.AddRange(responseModel.Movies);
+
+         } while (responseModel.Page != responseModel.TotalPages);
+
+         return items;
       }
 
       private IRestRequest GetRequest(string resource)
