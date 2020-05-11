@@ -1,12 +1,11 @@
-﻿using MoviesProcessing.Models;
-using MoviesProcessing.Models.Responses;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using RestSharp;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using MoviesProcessing.Models;
+using MoviesProcessing.Models.Responses;
+using Newtonsoft.Json;
+using RestSharp;
 
 namespace MoviesProcessing.Services
 {
@@ -15,15 +14,20 @@ namespace MoviesProcessing.Services
       private readonly IRestClient _restClient;
       private readonly IConfiguration _config;
 
-      private const string _discoverResource = "/discover/movie";
+      private const string _discoverResource = "/3/discover/movie";
       private const string _genresResource = "/genre/movie/list";
-      private const string _creditsResource = "/movie/movie_id/credits";
+      private const string _creditsResource = "/3/movie/movie_id/credits";
+      private const string _topRatedResource = "/3/movie/top_rated";
+      private const string _detailsResource = "3/movie/movie_id";
+
       private const string _apiKey = "MovieDbKey";
 
       private const string _apiKeyParameter = "api_key";
       private const string _movieIdParameter = "movie_id";
       private const string _withCastParameter = "with_cast";
       private const string _withCrewParameter = "with_crew";
+      private const string _languageParameter = "language";
+      private const string _pageParameter = "page";
 
       public MovieApiService(IConfiguration config)
       {
@@ -82,6 +86,39 @@ namespace MoviesProcessing.Services
          return movies;
       }
 
+      public async Task<IEnumerable<Movie>> GetTopRatedMoves(int page)
+      {
+         var request = GetRequest(_topRatedResource);
+         request.AddParameter(_languageParameter, "en-US");
+         request.AddParameter(_pageParameter, page);
+         var response = await _restClient.ExecuteGetAsync(request);
+
+         var movies = JsonConvert.DeserializeObject<MoviesResponseModel>(response.Content);
+         var filtered = FilterMovies(movies.Movies);
+
+         return filtered;
+      }
+
+      public async Task<MovieDetails> GetMovieDetails(string id)
+      {
+         var resource = _detailsResource.Replace(_movieIdParameter, id);
+         var request = GetRequest(resource);
+
+         request.AddParameter(_languageParameter, "en-US");
+         var response = await _restClient.ExecuteGetAsync(request);
+
+         var movie = JsonConvert.DeserializeObject<MovieDetails>(response.Content);
+
+         return movie;
+      }
+
+      private IEnumerable<Movie> FilterMovies(IEnumerable<Movie> movies)
+      {
+         var filtered = movies.Where(movie => movie.OriginalLanguage != "hi");
+
+         return filtered;
+      }
+
       private async Task<IEnumerable<Movie>> GetAllMoviePages(IRestRequest request)
       {
          var items = new List<Movie>();
@@ -92,6 +129,9 @@ namespace MoviesProcessing.Services
             var response = await _restClient.ExecuteGetAsync(request);
             responseModel = JsonConvert.DeserializeObject<MoviesResponseModel>(response.Content);
             items.AddRange(responseModel.Movies);
+            var currentPage = responseModel.Page;
+            request.AddParameter(_pageParameter, ++currentPage);
+
 
          } while (responseModel.Page != responseModel.TotalPages);
 

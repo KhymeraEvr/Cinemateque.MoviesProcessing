@@ -2,12 +2,12 @@
 
 namespace MoviesProcessing.Models
 {
-   public class Genre
+   public class ProductionCompany
    {
-      [JsonProperty("name")]
-      public string Name { get; set; }
-
       [JsonProperty("id")]
       public int Id { get; set; }
+
+      [JsonProperty("name")]
+      public string Name { get; set; }
    }
 }
