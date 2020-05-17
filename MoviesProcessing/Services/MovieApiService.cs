@@ -15,10 +15,11 @@ namespace MoviesProcessing.Services
       private readonly IConfiguration _config;
 
       private const string _discoverResource = "/3/discover/movie";
-      private const string _genresResource = "/genre/movie/list";
+      private const string _genresResource = "3/genre/movie/list";
       private const string _creditsResource = "/3/movie/movie_id/credits";
       private const string _topRatedResource = "/3/movie/top_rated";
       private const string _detailsResource = "3/movie/movie_id";
+      private const string _personResource = "3/person/person_id";
 
       private const string _apiKey = "MovieDbKey";
 
@@ -28,6 +29,7 @@ namespace MoviesProcessing.Services
       private const string _withCrewParameter = "with_crew";
       private const string _languageParameter = "language";
       private const string _pageParameter = "page";
+      private const string _personIdParameter = "person_id";
 
       public MovieApiService(IConfiguration config)
       {
@@ -110,6 +112,18 @@ namespace MoviesProcessing.Services
          var movie = JsonConvert.DeserializeObject<MovieDetails>(response.Content);
 
          return movie;
+      }
+      
+      public async Task<PersonDetails> GetPersonDetails(string id)
+      {
+         var resource = _personResource.Replace(_personIdParameter, id);
+         var request = GetRequest(resource);
+
+         var response = await _restClient.ExecuteGetAsync(request);
+
+         var details = JsonConvert.DeserializeObject<PersonDetails>(response.Content);
+
+         return details;
       }
 
       private IEnumerable<Movie> FilterMovies(IEnumerable<Movie> movies)

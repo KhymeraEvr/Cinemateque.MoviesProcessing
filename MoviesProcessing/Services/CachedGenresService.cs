@@ -1,8 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace MoviesProcessing.Services
 {
@@ -25,7 +22,7 @@ namespace MoviesProcessing.Services
          {
             _cache.Set(genre.Id, genre.Name);
          }
-      }       
+      }
 
       public async Task<string> GetGenreById(int id)
       {

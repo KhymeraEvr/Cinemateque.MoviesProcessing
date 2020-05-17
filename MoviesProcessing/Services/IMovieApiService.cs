@@ -6,7 +6,7 @@ using MoviesProcessing.Models.Responses;
 namespace MoviesProcessing.Services
 {
    public interface IMovieApiService
-  {
+   {
       Task<IEnumerable<Movie>> GetDiscoverFilms();
       Task<IEnumerable<Genre>> GetGenres();
       Task<CreditsResponse> GetCredits(string id);
@@ -14,5 +14,6 @@ namespace MoviesProcessing.Services
       Task<IEnumerable<Movie>> GetCrewMovies(string crewId);
       Task<IEnumerable<Movie>> GetTopRatedMoves(int page);
       Task<MovieDetails> GetMovieDetails(string id);
+      Task<PersonDetails> GetPersonDetails(string id);
    }
 }
