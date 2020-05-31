@@ -5,8 +5,17 @@ namespace MoviesProcessing.Models
 {
    public class Movie
    {
+      private string _poster;
+
       [JsonProperty("poster_path")]
-      public string Poster { get; set; }
+      public string Poster
+      {
+         get
+         {
+            return "http://image.tmdb.org/t/p/w780" + _poster;
+         }
+         set { _poster = value; }
+      }
 
       [JsonProperty("overview")]
       public string Overview { get; set; }
@@ -17,7 +26,7 @@ namespace MoviesProcessing.Models
       [JsonProperty("genre_ids")]
       public IEnumerable<int> GenreIds { get; set; }
 
-      public IEnumerable<string> Genres { get; set; }
+      public List<string> Genres { get; set; }
 
       [JsonProperty("id")]
       public int Id { get; set; }
@@ -39,5 +48,9 @@ namespace MoviesProcessing.Models
 
       [JsonProperty("vote_average")]
       public double VoteAverage { get; set; }
+
+      public IEnumerable<CastModel> Cast { get; set; }
+
+      public CrewModel Director { get; set; }
    }
 }

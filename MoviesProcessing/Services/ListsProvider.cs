@@ -28,6 +28,7 @@ namespace MoviesProcessing.Services
          "Metro-Goldwyn-Mayer",
          "New Line Cinema",
          "New Regency Pictures",
+         "New Regency Productions",
          "Nippon Television Network Corporation",
          "Paramount",
          "Pixar",
